@@ -12,4 +12,4 @@ git checkout v0.8
 make
 ```
 
-- make the binary in `linuxkit/bin` available to PATH
+- make the binary in `bin/linuxkit` available to PATH

@@ -11,7 +11,7 @@ ubuntu: Dockerfile.ubuntu
 	docker build -t "prasant/ubuntu" --no-cache -f Dockerfile.ubuntu . | tee ubuntu-log.txt
 
 deploy: linuxkit.yml
-	nc -nlvp 8888 > tmp-data.tar.gz &
+	nc -nlvp 8888 > gcov-data.tar.gz &
 	linuxkit build -disable-content-trust linuxkit.yml && linuxkit run qemu -mem 32768 -cpus 8 linuxkit
 
 clean:

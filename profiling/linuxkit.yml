@@ -8,7 +8,7 @@ init:
   - linuxkit/ca-certificates:v0.8
 onboot:
   - name: sysctl
-    image: prasant/sysctl:latest
+    image: linuxkit/sysctl:v0.8
   - name: dhcpcd
     image: linuxkit/dhcpcd:v0.8
     command: ["/sbin/dhcpcd", "--nobackground", "-f", "/dhcpcd.conf", "-1"]
