@@ -1,0 +1,18 @@
+all: build trim ubuntu deploy
+
+
+build: Dockerfile.build
+	docker build -t "prasant/linux-5.15-build" --no-cache -f Dockerfile.build . | tee build-log.txt
+
+trim: Dockerfile.kernel
+	docker build -t "prasant/linux-5.15-gcov" --no-cache -f Dockerfile.kernel . | tee trim-log.txt
+
+ubuntu: Dockerfile.ubuntu
+	docker build -t "prasant/ubuntu" --no-cache -f Dockerfile.ubuntu . | tee ubuntu-log.txt
+
+deploy: linuxkit.yml
+	nc -nlvp 8888 > tmp-data.tar.gz &
+	linuxkit build -disable-content-trust linuxkit.yml && linuxkit run qemu -mem 32768 -cpus 8 linuxkit
+
+clean:
+	rm -rf linuxkit-* *-log.txt *.tar.gz
