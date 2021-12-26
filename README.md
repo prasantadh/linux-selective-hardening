@@ -13,3 +13,9 @@ make
 ```
 
 - make the binary in `bin/linuxkit` available to PATH
+
+- run `make` in this directory
+    - this will build a container used to build other containers within 
+    `profiling` and `performance` directory.
+
+- consult `profiling` or `performance` directory as needed.

@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as kernel-build
+FROM prasant/kernel-build as kernel-build
 
 ARG FEATURE
 
@@ -10,64 +10,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
 RUN apt update
 
-RUN apt install -y git iucode-tool
-
-RUN apt install -y \ 
-    bash \ 
-    wget \
-    gnupg2 \
-    lsb-core \
-    software-properties-common \
-    git \
-    libncurses-dev \
-    gawk \
-    flex \
-    bison \
-    openssl \
-    libssl-dev \
-    dkms \
-    libelf-dev \
-    libudev-dev \
-    libpci-dev \
-    libiberty-dev \
-    autoconf \
-    iucode-tool \
-    netcat
-
-# download the kernel source
-WORKDIR /
-RUN mkdir -p /out/src
-RUN git clone --branch cfi-5.15 --depth=1 https://github.com/samitolvanen/linux.git
-
-# Download Intel ucode 
-# baa le biralo badhethe bhanera biralo badheko
-# no clue why it's needed but linuxkit does it so so doing it
-WORKDIR /tmp
-ENV UCODE_REPO=https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files
-ENV UCODE_COMMIT=microcode-20210216
-RUN set -e && \
-    if [ $(uname -m) = x86_64 ]; then \
-        git clone ${UCODE_REPO} ucode && \
-        cd ucode && \
-        git checkout ${UCODE_COMMIT} && \
-        iucode_tool --normal-earlyfw --write-earlyfw=/out/intel-ucode.cpio ./intel-ucode && \
-        cp license /out/intel-ucode-license.txt && \
-        mkdir -p /lib/firmware && \
-        cp -rav ./intel-ucode /lib/firmware; \
-    fi
-
-# Save kernel source
-## skipping this step as it's time-consuming and unnecessary
-# tar cJf /out/src/linux.tar.xz /linux
-
 # kernel config and compile
 WORKDIR /linux
 RUN cp /x86_64_config_gcov /linux/arch/x86/configs/x86_64_defconfig &&\
     make defconfig && \
     make oldconfig && \
     scripts/config --set-str CONFIG_LOCALVERSION -gcov && \
-    make -j `nproc` V=1 > log.txt && \
-    cp log.txt /out/src && \
+    make -j `nproc` V=1 | tee log.txt && \
     cp arch/x86_64/boot/bzImage /out/kernel && \
     cp System.map /out
 
