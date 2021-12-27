@@ -1,0 +1,10 @@
+ARG FEATURE
+
+FROM "prasant/linux-5.15$FEATURE-build" as kernel-build
+
+FROM scratch
+ENTRYPOINT []
+CMD []
+WORKDIR /
+COPY --from=kernel-build /out/* /
+
