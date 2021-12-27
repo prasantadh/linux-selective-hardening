@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# sed -i "0,/image: .*/s||image: prasant/linux-5.15-cfi-$1|" linuxkit.yml
+
+sed -i "s|image: prasant/linux.*|image: prasant/linux-5.15-cfi-$1|" linuxkit.yml
+
+linuxkit build -disable-content-trust linuxkit.yml
+linuxkit run qemu -mem 32768 -cpus 8 linuxkit
