@@ -25,11 +25,16 @@ services:
     image: prasant/ubuntu
     binds:
         - /etc/resolv.conf:/etc/resolv.conf
+        - /benchmark-with-kcbench:/root/benchmark-with-kcbench
     capabilities:
         - ALL
-    command: ["/bin/sh", "-c", "/bin/sleep infinity"]
+    command: ["/bin/sh", "-c", "/root/benchmark-with-kcbench"]
   - name: kernel
     image: prasant/linux-5.15-cfi-full
+files:
+  - path: benchmark-with-kcbench
+    source: "benchmark-with-kcbench"
+    mode: "755"
 trust:
   org:
     - linuxkit

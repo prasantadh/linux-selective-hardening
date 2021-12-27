@@ -1,3 +1,4 @@
 linuxkit-*
-*.tar.gz
+*.tar.gz*
 *.log
+results

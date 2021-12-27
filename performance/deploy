@@ -1,8 +1,14 @@
 #!/bin/bash
 
-# sed -i "0,/image: .*/s||image: prasant/linux-5.15-cfi-$1|" linuxkit.yml
+set -euo
 
-sed -i "s|image: prasant/linux.*|image: prasant/linux-5.15-cfi-$1|" linuxkit.yml
+FEATURE=$1
 
-linuxkit build -disable-content-trust linuxkit.yml
-linuxkit run qemu -mem 32768 -cpus 8 linuxkit
+if [ -z "$FEATURE" ]; then
+        echo "usage: benchmark [ full | none | selective ]"
+            exit 1
+fi
+
+sed -i '/name: ubuntu/,/command/{s|command.*|command: ["/bin/sh", "-c", "/bin/sleep infinity"]|}' linuxkit.yml
+
+./boot $1

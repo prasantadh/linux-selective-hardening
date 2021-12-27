@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -euo
+
+linuxkit build -disable-content-trust linuxkit.yml
+linuxkit run qemu -mem 32768 -cpus 8 linuxkit
