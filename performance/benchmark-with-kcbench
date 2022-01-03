@@ -3,7 +3,7 @@
 set -euo
 
 cd /root
-curl -O https://gitlab.com/knurd42/kcbench/-/raw/master/kcbench
-bash kcbench -d -v -j `nproc` -i 10 > kcbench.results
+uname -a > kcbench.results
+bash kcbench -d -v -j `nproc` -i 10 >> kcbench.results
 nc -N 10.0.2.2 8888 < kcbench.results
 

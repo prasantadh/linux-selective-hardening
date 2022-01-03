@@ -28,7 +28,7 @@ services:
         - /benchmark-with-kcbench:/root/benchmark-with-kcbench
     capabilities:
         - ALL
-    command: ["/bin/sh", "-c", "/root/benchmark-with-kcbench"]
+    command: ["/bin/sh", "-c", "/bin/sleep infinity"]
   - name: kernel
     image: prasant/linux-5.15-cfi-full
 files:

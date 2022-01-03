@@ -29,7 +29,8 @@ RUN apt install -y \
     libpci-dev \
     libiberty-dev \
     autoconf \
-    iucode-tool
+    iucode-tool \
+    magic-wormhole
 
 
 # get the compiler

@@ -22,7 +22,10 @@ RUN if [ -n "$FEATURE" ] && [ $FEATURE = -cfi-selective ]; then \
     scripts/config --set-str CONFIG_LOCALVERSION ${FEATURE} && \
     make LLVM=1 -j `nproc` V=1 KCFLAGS=${KCFLAGS} | tee log.txt && \
     cp arch/x86_64/boot/bzImage /out/kernel && \
-    cp System.map /out
+    cp System.map /out && \
+    cd tools/perf && \
+    make LLVM=1 -j `nproc` && \
+    cp perf /out/perf
 
 # Modules and Device Tree binaries
 RUN make INSTALL_MOD_PATH=/tmp/kernel-modules modules_install && \

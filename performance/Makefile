@@ -1,10 +1,10 @@
 all: build_full trim_full build_selective trim_selective build_none trim_none ubuntu
 
-full: build_full trim_full ubuntu
+full: build_full trim_full
 
-selective: build_selective trim_selective ubuntu
+selective: build_selective trim_selective
 
-none: build_none trim_none ubuntu
+none: build_none trim_none
 
 
 build_full: Dockerfile.build
