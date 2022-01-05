@@ -21,16 +21,12 @@ services:
     image: linuxkit/getty:v0.8
     env:
         - INSECURE=true
-  - name: ubuntu
-    image: prasant/ubuntu
+  - name: nginx
+    image: nginx
     binds:
         - /etc/resolv.conf:/etc/resolv.conf
-        - /benchmark-with-kcbench:/root/benchmark-with-kcbench
     capabilities:
-        - ALL
-    command: ["/bin/sh", "-c", "/bin/sleep infinity"]
-  - name: kernel
-    image: prasant/linux-5.15-cfi-full
+        - all
 files:
   - path: benchmark-with-kcbench
     source: "benchmark-with-kcbench"

@@ -9,6 +9,4 @@ if [ -z "$FEATURE" ]; then
             exit 1
 fi
 
-sed -i '/name: ubuntu/,/command/{s|command.*|command: ["/bin/sh", "-c", "/bin/sleep infinity"]|}' linuxkit.yml
-
 ./boot $1

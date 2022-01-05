@@ -28,7 +28,13 @@ services:
         - /gather-on-test.sh:/root/gather-on-test.sh
     capabilities:
         - ALL
-    command: ["/bin/sh", "-c", "/root/gather-on-test.sh"]
+    command: ["/bin/sh", "-c", "/bin/sleep infinity"]
+  - name: nginx
+    image: nginx
+    binds:
+        - /etc/resolv.conf:/etc/resolv.conf
+    capabilities:
+        - all
 files:
   - path: gather-on-test.sh
     source: gather-on-test.sh

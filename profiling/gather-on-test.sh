@@ -3,11 +3,6 @@
 # mount debugfs for data
 mount -t debugfs none /sys/kernel/debug
 
-# run kcbench
-cd /root
-curl -O https://gitlab.com/knurd42/kcbench/-/raw/master/kcbench
-bash kcbench -b -d -v -i 1 -j `nproc` > kcbench.log
-
 # collect gcov data
 DEST="gcov-data.tar.gz"
 GCDA=/sys/kernel/debug/gcov
@@ -27,6 +22,3 @@ rm -rf $TEMPDIR
 
 echo "$DEST successfully created, copy to build system and unpack with:"
 echo "  tar xfz $DEST"
-
-# send the data to host
-nc -N 10.0.2.2 8888 < $DEST
