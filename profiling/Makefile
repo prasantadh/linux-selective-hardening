@@ -13,7 +13,7 @@ ubuntu: Dockerfile.ubuntu
 
 deploy: linuxkit.yml
 	linuxkit build -disable-content-trust linuxkit.yml 
-	linuxkit run qemu -publish 8080:80 -mem 32768 -cpus 8 linuxkit
+	linuxkit run qemu -publish 6379:6379 -mem 32768 -cpus 8 linuxkit
 
 clean:
 	rm -rf linuxkit-* *.log *.tar.gz

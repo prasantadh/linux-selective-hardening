@@ -21,8 +21,8 @@ services:
     image: linuxkit/getty:v0.8
     env:
         - INSECURE=true
-  - name: nginx
-    image: nginx
+  - name: redis
+    image: redis
     binds:
         - /etc/resolv.conf:/etc/resolv.conf
     capabilities:

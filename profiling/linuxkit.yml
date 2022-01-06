@@ -29,8 +29,8 @@ services:
     capabilities:
         - ALL
     command: ["/bin/sh", "-c", "/bin/sleep infinity"]
-  - name: nginx
-    image: nginx
+  - name: redis
+    image: redis
     binds:
         - /etc/resolv.conf:/etc/resolv.conf
     capabilities:
