@@ -1,0 +1,8 @@
+FROM prasant/ubuntu
+
+WORKDIR /root
+# get the phoronix test suite on the container
+RUN curl -O https://phoronix-test-suite.com/releases/repo/pts.debian/files/phoronix-test-suite_10.8.4_all.deb
+RUN gdebi -n phoronix-test-suite_10.8.4_all.deb
+RUN phoronix-test-suite install openssl pybench git build-linux-kernel redis apache nginx ipc-benchmark
+RUN rm *.deb

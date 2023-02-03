@@ -3,13 +3,21 @@
 # mount debugfs for data
 mount -t debugfs none /sys/kernel/debug
 
-# run kcbench
-cd /root
-curl -O https://gitlab.com/knurd42/kcbench/-/raw/master/kcbench
-bash kcbench -b -d -v -i 1 -j `nproc` > kcbench.log
+# run benchmarks as per defined variables
+if [ "$PHORONIX" = true ]; then
+    DEST=PHORONIX
+fi
+
+if [ "$SPEC" = true ]; then
+    DEST=SPEC
+fi
+
+if [ "$NAS" = true ]; then
+    DEST=NAS
+fi
 
 # collect gcov data
-DEST="gcov-data.tar.gz"
+DEST=$DEST-`date +%s`-"gcov-data.tar.gz"
 GCDA=/sys/kernel/debug/gcov
 
 if [ -z "$DEST" ] ; then
@@ -29,4 +37,12 @@ echo "$DEST successfully created, copy to build system and unpack with:"
 echo "  tar xfz $DEST"
 
 # send the data to host
-nc -N 10.0.2.2 8888 < $DEST
+scp -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    $DEST \
+    bhakku@10.0.2.2:/home/bhakku/workspace/data/$DEST
+
+curl -X POST https://api.pushover.net/1/messages.json \
+    --data-urlencode "user=uqa4re9umr2tazsaeasm8r6pg3vi1s" \
+    --data-urlencode "token=a7gqrzzd5461ctpgazmaa4m5f96wiw" \
+    --data-urlencode "message=profiling completed at $(date)"

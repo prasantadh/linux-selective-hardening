@@ -31,31 +31,5 @@ RUN apt -y install \
     magic-wormhole \
     golang  \
     gdebi   \
-    mpich
-
-WORKDIR /root
-# get the phoronix test suite on the container
-RUN curl -O https://phoronix-test-suite.com/releases/repo/pts.debian/files/phoronix-test-suite_10.8.4_all.deb
-RUN gdebi -n phoronix-test-suite_10.8.4_all.deb
-RUN phoronix-test-suite install openssl pybench git build-linux-kernel redis apache nginx ipc-benchmark
-
-# get the NAS parallel benchmark workloads
-RUN wget https://www.nas.nasa.gov/assets/npb/NPB3.4.2.tar.gz
-RUN tar xvzf NPB3.4.2.tar.gz
-## MPI tests
-WORKDIR /root/NPB3.4.2/NPB3.4-MPI
-RUN cp config/make.def.template config/make.def
-RUN make bt cg ep ft is lu mg sp CLASS=A NPROCS=`nprocs` SUBTYPE=full
-## OMP tests
-WORKDIR /root/NPB3.4.2/NPB3.4-OMP
-RUN cp config/make.def.template config/make.def
-RUN make bt cg ep ft is lu mg sp CLASS=A NPROCS=`nprocs` SUBTYPE=full
-
-# get the spec cpu 2006 on the container
-# mounting the iso requires privileged access
-# which isn't allowed by docker file.
-# Do this on the benchmarking script
-COPY spec.iso   /root/spec.iso
-# RUN  runspec --config Example-linux64-amd64-gcc43+.cfg --noreportable perlbench bzip2 gcc mcf gobmk hmmer sjeng libquantum h264ref omnetpp astar xalancbmk
-
-WORKDIR /root
+    mpich   \
+    sshpass
