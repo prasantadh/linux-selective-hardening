@@ -1,10 +1,10 @@
 files:
-- mode: '0755'
-  path: gather-on-test.sh
-  source: gather-on-test.sh
 - mode: '0600'
   path: qemu-ssh-access
   source: qemu-ssh-access
+- mode: '0755'
+  path: profile.sh
+  source: profile.sh
 init:
 - linuxkit/init:v0.8
 - linuxkit/runc:v0.8
@@ -12,7 +12,7 @@ init:
 - linuxkit/ca-certificates:v0.8
 kernel:
   cmdline: console=tty0 console=ttyS0 console=ttyAMA0
-  image: prasant/linux-5.15-gcov:latest
+  image: tracks/linux-gcov:latest
 onboot:
 - image: linuxkit/sysctl:v0.8
   name: sysctl
@@ -37,8 +37,8 @@ services:
   name: getty
 - binds:
   - /etc/resolv.conf:/etc/resolv.conf
-  - /gather-on-test.sh:/root/gather-on-test.sh
   - /qemu-ssh-access:/root/.ssh/id_ed25519
+  - /profile.sh:/root.profile.sh
   capabilities:
   - ALL
   command:
@@ -46,9 +46,10 @@ services:
   - -c
   - /usr/bin/sleep infinity
   env:
-  - NAS=true
-  image: prasant/nas:latest
-  name: nas
+  - UBUNTU=true
+  - ACTION=profile
+  image: tracks/ubuntu:latest
+  name: tracks/ubuntu
 trust:
   org:
   - linuxkit

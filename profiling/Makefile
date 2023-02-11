@@ -21,7 +21,6 @@ nas: Dockerfile.nas
 	docker build -t "prasant/nas" --no-cache -f Dockerfile.nas . | tee $@.log
 
 deploy: linuxkit.yml
-	nc -nlvp 8888 > gcov-data.tar.gz &
 	linuxkit build -disable-content-trust linuxkit.yml && linuxkit run qemu -mem 49152 -cpus 8 linuxkit
 
 clean:

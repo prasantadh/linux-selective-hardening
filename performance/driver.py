@@ -48,6 +48,7 @@ def profile():
                         '/gather-on-test.sh:/root/gather-on-test.sh',
                         '/qemu-ssh-access:/root/.ssh/id_ed25519']
             }
+
     with open('linuxkit.yml.template', 'r') as stream:
         template = yaml.safe_load(stream)
 
@@ -63,8 +64,8 @@ def profile():
     with open('linuxkit.yml', 'w') as config_file:
         yaml.dump(template, config_file)
 
-    status = os.system('make deploy')
-    print('machine status: ', status)
+    # status = os.system('make deploy')
+    # print('machine status: ', status)
 
 args = parser.parse_args()
 if args.command == 'profile':

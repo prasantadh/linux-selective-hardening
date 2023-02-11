@@ -26,8 +26,10 @@ RUN apt -y install \
     libelf-dev \
     gcc \
     binutils \
+    netcat \
     git \
+    magic-wormhole \
     golang  \
     gdebi   \
     mpich   \
-    bombardier
+    sshpass
