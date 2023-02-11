@@ -45,10 +45,10 @@ def build(args):
             else:
                 assert args.level is not None, '--level required'
                 cmd += f"--build-arg COMPILER='LLVM=1' "
-                cmd += f"-t linux-{args.mitigation}-{args.level} "
+                cmd += f"-t linux-{args.mitigation}-{args.level}-build "
         cmd += "-f Dockerfile.kernel ."
     else:
-        cmd = ( f'docker build --target {args.suite} '
+        cmd = ( f'docker build --no-cache --target {args.suite} '
                 f'-t tracks/{args.suite} '
                 f'-f Dockerfile.benchmark .' )
     print(cmd)

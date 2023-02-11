@@ -2,3 +2,4 @@ linuxkit-*
 *.tar.gz*
 *.log
 results
+linuxkit.yml

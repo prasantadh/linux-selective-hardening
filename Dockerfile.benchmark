@@ -31,7 +31,7 @@ RUN apt install -y ssh  \
         apt-utils
 
 # Build NAS benchmark container
-From benchmark-builder as nas
+From tracks/benchmark-builder as nas
 WORKDIR /root
 # get the NAS parallel benchmark workloads
 RUN wget https://www.nas.nasa.gov/assets/npb/NPB3.4.2.tar.gz
@@ -48,7 +48,7 @@ WORKDIR /root
 RUN rm *.tar.gz
 
 # Build phoronix benchmark container
-FROM benchmark-builder as phoronix
+FROM tracks/benchmark-builder as phoronix
 WORKDIR /root
 # get the phoronix test suite on the container
 RUN curl -O https://phoronix-test-suite.com/releases/repo/pts.debian/files/phoronix-test-suite_10.8.4_all.deb
@@ -57,7 +57,7 @@ RUN phoronix-test-suite install openssl pybench git build-linux-kernel redis apa
 RUN rm *.deb
 
 # Build spec benchmark container
-FROM benchmark-builder as spec
+FROM tracks/benchmark-builder as spec
 # get the spec cpu 2006 on the container
 # mounting the iso requires privileged access
 # which isn't allowed by docker file
@@ -84,5 +84,5 @@ RUN cd spec && . ./shrc && \
     xalancbmk
 
 # Build ubuntu benchmark container
-FROM benchmark-bulder as ubuntu
+FROM tracks/benchmark-builder as ubuntu
 RUN echo "Already what we need!"
