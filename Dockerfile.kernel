@@ -91,7 +91,7 @@ RUN KCFLAGS="-fno-pie"; \
     export PATH=/lib/llvm-13/bin:$PATH && \
     make $COMPILER defconfig && \
     make $COMPILER oldconfig && \
-    scripts/config --set-str CONFIG_LOCALVERSION ${FEATURE}${LEVEL} && \
+    scripts/config --set-str CONFIG_LOCALVERSION "${FEATURE}${LEVEL}" && \
     make $COMPILER -j `nproc` V=1 KCFLAGS=${KCFLAGS} | tee log.txt && \
     cp arch/x86_64/boot/bzImage /out/kernel && \
     cp System.map /out

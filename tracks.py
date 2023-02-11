@@ -3,6 +3,7 @@ import sys
 import yaml
 import json
 import os
+import warnings
 
 def update_kernel(template, kernel):
     template['kernel']['image'] = kernel
@@ -45,13 +46,13 @@ def build(args):
                 assert args.level is not None, '--level required'
                 cmd += f"--build-arg COMPILER='LLVM=1' "
                 cmd += f"-t linux-{args.mitigation}-{args.level} "
-            cmd += "-f Dockerfile.kernel ."
+        cmd += "-f Dockerfile.kernel ."
     else:
         cmd = ( f'docker build --target {args.suite} '
                 f'-t tracks/{args.suite} '
                 f'-f Dockerfile.benchmark .' )
     print(cmd)
-    # status = os.system(cmd)
+    status = os.system(cmd)
 
 def benchmark(args):
 
@@ -63,8 +64,7 @@ def benchmark(args):
 
     update_kernel(template, kernel)
     add_file(template, 'benchmark.sh')
-    print(json.dumps(template, indent=4))
-    # run()
+    run()
 
 def profile(args):
     with open('linuxkit.yml.template', 'r') as stream:
@@ -135,4 +135,3 @@ profile_parser.set_defaults(func=profile)
 
 args = parser.parse_args()
 args.func(args)
-print(args)

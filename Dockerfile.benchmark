@@ -30,16 +30,6 @@ RUN apt install -y ssh  \
         bombardier  \
         apt-utils
 
-# Build spec benchmark container
-FROM benchmark-builder as spec
-# get the spec cpu 2006 on the container
-# mounting the iso requires privileged access
-# which isn't allowed by docker file.
-# Do this on the benchmarking script
-COPY spec.tar.gz   /root/spec.tar.gz
-WORKDIR /root
-RUN tar xvzf spec.tar.gz
-
 # Build NAS benchmark container
 From benchmark-builder as nas
 WORKDIR /root
@@ -65,6 +55,33 @@ RUN curl -O https://phoronix-test-suite.com/releases/repo/pts.debian/files/phoro
 RUN gdebi -n phoronix-test-suite_10.8.4_all.deb
 RUN phoronix-test-suite install openssl pybench git build-linux-kernel redis apache nginx ipc-benchmark
 RUN rm *.deb
+
+# Build spec benchmark container
+FROM benchmark-builder as spec
+# get the spec cpu 2006 on the container
+# mounting the iso requires privileged access
+# which isn't allowed by docker file
+# we get a tarball that is already extracted and
+# installed at /root on a base ubuntu container
+COPY spec.tar.gz   /root/spec.tar.gz
+WORKDIR /root
+RUN tar xvzf spec.tar.gz && rm spec.tar.gz
+RUN cd spec && . ./shrc && \
+    runspec \
+    --action build \
+    --config Example-linux64-amd64-gcc43+.cfg \
+    --noreportable \
+    bzip2 \
+    gcc \
+    mcf \
+    gobmk \
+    hmmer \
+    sjeng \
+    libquantum \
+    h264ref \
+    omnetpp \
+    astar \
+    xalancbmk
 
 # Build ubuntu benchmark container
 FROM benchmark-bulder as ubuntu
