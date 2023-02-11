@@ -1,4 +1,4 @@
-# selective-cfi-on-linuxkit
+# linux-selective-hardening
 this repository provides details on how to profile linux-5.15 and use that profile to selectively instrument it with cfi all using linuxkit and docker.
 
 ## pre-requisite
@@ -14,8 +14,10 @@ make
 
 - make the binary in `bin/linuxkit` available to PATH
 
-- run `make` in this directory
-    - this will build a container used to build other containers within 
-    `profiling` and `performance` directory.
+## tracks.py
+Currently the Dockerfiles are a little unclean and requires running the following two commands for faster builds before interfacing with tracks.py
 
-- consult `profiling` or `performance` directory as needed.
+```bash
+$ docker build --target benchmark-builder -t tracks/benchmark-builder -f Dockerfile.benchmark .
+$ docker build --target kernel-builder -t tracks/kernel-builder -f Dockerfile.kernel .
+```
