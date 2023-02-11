@@ -1,0 +1,139 @@
+ARG BUILD_IMAGE="tracks/linux"
+FROM ubuntu:22.04 as kernel-builder
+
+########################################################################
+###  build a container that can be used to compile the kernel         ##
+########################################################################
+
+# copy the required files over
+COPY / /
+
+# install dependencies
+# ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ="America/New_York"
+RUN apt update &&   \
+    apt install -yq tzdata && \
+    ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
+RUN apt install -y  \ 
+    bash    \ 
+    wget    \
+    gnupg2  \
+    lsb-core    \
+    software-properties-common  \
+    git     \
+    libncurses-dev  \
+    gawk    \
+    flex    \
+    bison   \
+    openssl \
+    libssl-dev  \
+    dkms    \
+    libelf-dev  \
+    libudev-dev \
+    libpci-dev  \
+    libiberty-dev   \
+    autoconf    \
+    iucode-tool \
+    magic-wormhole
+
+
+# get the compiler
+RUN wget https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh 15
+
+# download the kernel source
+WORKDIR /
+RUN mkdir -p /out/src
+RUN git clone --progress --verbose --branch v6.1 --depth=1 https://github.com/torvalds/linux.git
+
+# Download Intel ucode 
+# no clue why it's needed but linuxkit does it so so doing it
+WORKDIR /tmp
+ENV UCODE_REPO=https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files
+ENV UCODE_COMMIT=microcode-20210608
+RUN set -e && \
+    if [ $(uname -m) = x86_64 ]; then \
+        git clone --progress --verbose ${UCODE_REPO} ucode && \
+        cd ucode && \
+        git checkout ${UCODE_COMMIT} && \
+        iucode_tool --normal-earlyfw --write-earlyfw=/out/intel-ucode.cpio ./intel-ucode && \
+        cp license /out/intel-ucode-license.txt && \
+        mkdir -p /lib/firmware && \
+        cp -rav ./intel-ucode /lib/firmware; \
+    fi
+
+##################################################################
+#### compile the kernel then keep it around                    ###
+##################################################################
+From tracks/kernel-builder as kernel-build
+
+# FEATURE can be -gcov, -cfi, -stackguard or EMPTY
+# LEVEL can be -full, -selective. Applicable for FEATURE=-cfi only
+ARG FEATURE  
+ARG LEVEL
+
+# -gcov uses gcc but cfi uses clang
+# COMPILER can be LLVM=1 or EMPTY
+ARG COMPILER
+
+# install dependencies
+RUN apt update
+
+# kernel config and compile
+WORKDIR /linux
+RUN KCFLAGS="-fno-pie"; \
+    if [ -n "$LEVEL" ] && [ "$LEVEL" = -selective ]; then \
+        KCFLAGS="-fsanitize-ignorelist=/ignorelist.txt -fno-pie"; \
+    fi; \
+    cp /x86_64_config${FEATURE} /linux/arch/x86/configs/x86_64_defconfig && \
+    export PATH=/lib/llvm-15/bin:$PATH && \
+    make $COMPILER defconfig && \
+    make $COMPILER oldconfig && \
+    scripts/config --set-str CONFIG_LOCALVERSION "${FEATURE}${LEVEL}" && \
+    make $COMPILER -j `nproc` V=1 KCFLAGS=${KCFLAGS} | tee log.txt && \
+    cp arch/x86_64/boot/bzImage /out/kernel && \
+    cp System.map /out
+
+# Modules and Device Tree binaries
+RUN make INSTALL_MOD_PATH=/tmp/kernel-modules modules_install && \
+    ( DVER=$(basename $(find /tmp/kernel-modules/lib/modules/ -mindepth 1 -maxdepth 1)) && \
+      cd /tmp/kernel-modules/lib/modules/$DVER && \
+      rm build source && \
+      ln -s /usr/src/linux-headers-$DVER build ) && \
+    case $(uname -m) in \
+    aarch64) \
+        make INSTALL_DTBS_PATH=/tmp/kernel-modules/boot/dtb dtbs_install; \
+        ;; \
+    esac && \
+    ( cd /tmp/kernel-modules && tar cf /out/kernel.tar . )
+
+# Headers (userspace API)
+RUN mkdir -p /tmp/kernel-headers/usr && \
+    make INSTALL_HDR_PATH=/tmp/kernel-headers/usr headers_install && \
+    ( cd /tmp/kernel-headers && tar cf /out/kernel-headers.tar usr )
+
+# Headers (kernel development)
+RUN DVER=$(basename $(find /tmp/kernel-modules/lib/modules/ -mindepth 1 -maxdepth 1)) && \
+    dir=/tmp/usr/src/linux-headers-$DVER && \
+    mkdir -p $dir && \
+    cp /linux/.config $dir && \
+    cp /linux/Module.symvers $dir && \
+    find . -path './include/*' -prune -o \
+           -path './arch/*/include' -prune -o \
+           -path './scripts/*' -prune -o \
+           -type f \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+                      -name '*.lds' -o -name '*.pl' -o -name '*.sh' -o \
+                      -name 'objtool' -o -name 'fixdep' -o -name 'randomize_layout_seed.h' \) | \
+         tar cf - -T - | (cd $dir; tar xf -) && \
+    ( cd /tmp && tar cf /out/kernel-dev.tar usr/src )
+RUN cp -r /out/* /
+
+FROM ${BUILD_IMAGE} as kernel-build-image
+FROM scratch
+ENTRYPOINT []
+CMD []
+WORKDIR /
+COPY --from=kernel-build-image /out/* /
