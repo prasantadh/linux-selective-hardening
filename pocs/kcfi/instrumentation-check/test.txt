@@ -1,0 +1,2 @@
+fun:*x86_get_pmu*
+fun:*events_sysfs_show*
