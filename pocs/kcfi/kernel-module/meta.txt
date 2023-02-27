@@ -1,0 +1,4 @@
+results-1.txt:
+- S32_MAX loops
+- 25 runs of full CFI
+- 25 runs of selective CFI
