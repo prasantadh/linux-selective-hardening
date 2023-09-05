@@ -1123,3 +1123,9 @@ struct folio {
 	};
 };
 ```
+
+### Performance overhead
+
+We haven't found any workaround for evaluating the performance overhead of this
+patch but you can find an ample research about the overhead of various kernel
+security patches [here]("https://dl.acm.org/doi/10.1145/3341301.3359640)
