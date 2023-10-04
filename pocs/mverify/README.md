@@ -54,3 +54,31 @@ The linux slab allocator can be difficult to understand. Here are a few resource
 - [https://www.kernel.org/doc/Documentation/x86/x86\_64/mm.txt](https://www.kernel.org/doc/Documentation/x86/x86_64/mm.txt) Linux Virtual Memory map, official documentation
 - [https://www.kernel.org/doc/gorman/pdf/understand.pdf](https://www.kernel.org/doc/gorman/pdf/understand.pdf) often way more than necessary but sometimes indispensable
 - And the official linux kernel source code repo
+
+Aside from the linux slab allocator, this implementation requires a good amount 
+of work with compiler instrumentation. Here are a few resources: 
+- [https://www.cs.cornell.edu/~asampson/blog/llvm.html](https://www.cs.cornell.edu/~asampson/blog/llvm.html) Adrian Sampson's blog, LLVM for Grad Student. Good starting point read.
+- [https://blog.trailofbits.com/2019/06/25/creating-an-llvm-sanitizer-from-hopes-and-dreams/] trail of bits winternship project to build a sanitizer. Associated codebase is at 
+[https://github.com/trailofbits/llvm-sanitizer-tutorial](https://github.com/trailofbits/llvm-sanitizer-tutorial). The code itself wasn't too helpful, however the references point to 
+a set of pull requests for type sanitizers which was indispensable in building 
+a prototype [https://reviews.llvm.org/D32199](https://reviews.llvm.org/D32199)
+(browse down to the "Stack" tab where there are associated patches for llvm,
+clang, and runtime components of building a sanitizer)
+- [https://reviews.llvm.org/D119296](https://reviews.llvm.org/D119296) KCFI sanitizer
+pull request. This is a bit bulky and harder to read however seeing parallels
+with type sanitizer can help.
+- [https://reviews.llvm.org/D10411#inline-84598](https://reviews.llvm.org/D10411#inline-84598)
+KASAN patch for the compiler. similar properties to KCFI patch.
+- [https://llvm.org/docs/GettingInvolved.html](https://llvm.org/docs/GettingInvolved.html)
+llvm office hours, must attend at least some to get involved and address questions
+- [https://mukulrathi.com/create-your-own-programming-language/llvm-ir-cpp-api-tutorial/](https://mukulrathi.com/create-your-own-programming-language/llvm-ir-cpp-api-tutorial/)
+a set of explanation and code for implementing your own programming language.
+Very helpful to get usage scenario.
+- [https://ucsd-cse231-w21.github.io/](https://ucsd-cse231-w21.github.io/) good
+content on compiler design. Zoom recording is not available but the some slides 
+are still pretty good. Particularly used this [https://ucsd-pl.github.io/cse231/wi18/tutorials/Introduction-to-LLVM.pdf](https://ucsd-pl.github.io/cse231/wi18/tutorials/Introduction-to-LLVM.pdf)
+- There were some additional resources, primarily concerning the use of LLVM IRBuilder class.
+However this came about more as SO answers. A lot of it will be apparent once
+you start coding the compiler. Some of the work will be visible on the author's
+llvm mverify pass implementation [https://github.com/prasantadh/llvm-project/tree/mverify](https://github.com/prasantadh/llvm-project/tree/mverify)
+
